@@ -1,4 +1,4 @@
-function resultado = aplicarFiltro(imagen, filtro)
+function resultado = filtrosEspeciales(imagen, filtro)
     imagen = double(imagen);
     [x, y, ~] = size(imagen);
     resultado = zeros(x, y);
