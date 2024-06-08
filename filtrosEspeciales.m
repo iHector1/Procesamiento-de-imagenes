@@ -35,11 +35,11 @@ function resultado = suavizarImagen(imagen, filtro)
     end
 end
 
-nucleoLaplace = [ 0, 0, -1, 0, 0;
-                  0, -1, -2, -1, 0;
+nucleoLaplace = [  0,  0, -1,  0,  0;
+                   0, -1, -2, -1,  0;
                   -1, -2, 16, -2, -1;
-                  0, -1, -2, -1, 0;
-                  0, 0, -1, 0, 0];
+                   0, -1, -2, -1,  0;
+                   0,  0, -1,  0,  0];
 
 nucleoGaussiano = [ 0, 1, 2, 1, 0;
                     1, 3, 5, 3, 1;
