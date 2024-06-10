@@ -1,29 +1,22 @@
 % Crear una imagen binaria de ejemplo
-binaryImage = [
-    0 0 0 0 0 0 0 0 0;
-    0 1 1 0 0 0 1 1 0;
-    0 1 1 0 0 0 1 1 0;
-    0 0 0 0 1 1 1 0 0;
-    0 1 1 0 0 0 1 1 0;
-    0 1 1 0 0 0 1 1 0;
-    0 0 0 0 0 0 0 0 0;
-];
+binaryImage = imread('figuras.png');
+binaryImage = rgb2gray(binaryImage);
+binaryImage = imbinarize(binaryImage);
 
-% Primera pasada
-[labeledImage, label, equivalences] = firstPass(binaryImage);
+% Ejecutar la primera pasada
+[labeledImage, equivalences] = firstPass(binaryImage);
 
 % Segunda pasada
-labeledImage = secondPass(labeledImage, equivalences);
-
-% Mostrar la imagen etiquetada final
-imshow(labeledImage, []);
-title('Imagen Etiquetada Final');
+[labeledImage, numObjects] = secondPass(labeledImage, equivalences);
 
 % Mostrar el número de objetos
-numObjects = max(labeledImage(:));
-numObjects;
+numObjects
+figure(1);
+sgtitle(['objetos: ', num2str(numObjects)]);
+subplot(1, 2, 1), imshow(binaryImage), title('Original');
+subplot(1, 2, 2), imshow(label2rgb(labeledImage)), title('objetos detectados');
 
-function [labeledImage, label] = firstPass(binaryImage)
+function [labeledImage, equivalences] = firstPass(binaryImage)
     % Dimensiones de la imagen
     [rows, cols] = size(binaryImage);
 
@@ -33,8 +26,8 @@ function [labeledImage, label] = firstPass(binaryImage)
     % Inicializar la etiqueta actual
     label = 0;
 
-    % Diccionario para las equivalencias
-    equivalences = containers.Map('KeyType', 'double', 'ValueType', 'any');
+    % Inicializar la estructura de equivalencias
+    equivalences = {};
 
     % Recorrer la imagen
     for r = 1:rows
@@ -47,6 +40,7 @@ function [labeledImage, label] = firstPass(binaryImage)
                     % Asignar una nueva etiqueta
                     label = label + 1;
                     labeledImage(r, c) = label;
+                    equivalences{label} = label;
                 else
                     % Asignar la etiqueta mínima de los vecinos
                     minLabel = min(neighbors);
@@ -55,11 +49,7 @@ function [labeledImage, label] = firstPass(binaryImage)
                     % Registrar equivalencias
                     for neighbor = neighbors
                         if neighbor ~= minLabel
-                            if isKey(equivalences, neighbor)
-                                equivalences(neighbor) = unique([equivalences(neighbor), minLabel]);
-                            else
-                                equivalences(neighbor) = minLabel;
-                            end
+                            equivalences{neighbor} = minLabel;
                         end
                     end
                 end
@@ -83,7 +73,8 @@ function neighbors = getNeighbors(labeledImage, r, c)
         neighbors = [neighbors, labeledImage(r-1, c+1)];
     end
 end
-function labeledImage = secondPass(labeledImage, equivalences)
+
+function [labeledImage, numObjects] = secondPass(labeledImage, equivalences)
     % Dimensiones de la imagen
     [rows, cols] = size(labeledImage);
 
@@ -95,15 +86,20 @@ function labeledImage = secondPass(labeledImage, equivalences)
             end
         end
     end
+
+    % Obtener etiquetas únicas
+    uniqueLabels = unique(labeledImage(:));
+
+    % Remover la etiqueta 0
+    uniqueLabels(uniqueLabels == 0) = [];
+
+    % Contar el número de objetos
+    numObjects = numel(uniqueLabels);
 end
 
 function root = findRoot(equivalences, label)
-    if isKey(equivalences, label)
-        root = equivalences(label);
-        if root ~= label
-            root = findRoot(equivalences, root);
-        end
-    else
-        root = label;
+    while equivalences{label} ~= label
+        label = equivalences{label};
     end
+    root = label;
 end

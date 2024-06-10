@@ -5,17 +5,17 @@ apesos = a(:,:,1)*pesos(1)+a(:,:,2)*pesos(2)+a(:,:,3)*pesos(3);
 figure(1);
 imshow(apesos)
 
-[m,n] = size(a);
+[m,n] = size(apesos);
 
 for i =1 : m
     for j = 1 : n
-        if a(i,j) <= 128
-            a(i,j)=0;
+        if apesos(i,j) <= 128
+            apesos(i,j)=0;
         else
-            a(i,j) = 255;
+            apesos(i,j) = 255;
         end
     end
 
 end
 figure(2);
-imshow(a);
+imshow(apesos);

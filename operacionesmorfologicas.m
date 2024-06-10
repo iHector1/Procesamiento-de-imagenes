@@ -8,7 +8,7 @@ apesos = a(:,:,1)*pesos(1)+a(:,:,2)*pesos(2)+a(:,:,3)*pesos(3);
 binaryImage = imbinarize(apesos);
 
 prompt = 'Genera el tamana de la matriz: ';
-n = input(prompt);
+n = 5;
 % Definir un elemento estructurante
 structuringElement = true(n, n);
 
